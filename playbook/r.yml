@@ -1,0 +1,22 @@
+---
+  - hosts: elk
+    become: true
+    tasks:
+     - name: stop nginx
+       service: name=nginx state=stopped enabled=yes
+
+     - name: restart elasticsearch
+       service: name=elasticsearch state=restarted enabled=yes
+    
+     - name: restart kibana
+       service: name=kibana state=restarted enabled=yes
+
+     - name: restart logstash
+       service: name=logstash state=restarted enabled=yes
+
+
+     - name: restart nginx
+       service: name=nginx state=restarted enabled=yes
+
+     - name: restart filebeat
+       service: name=filebeat state=restarted enabled=yes

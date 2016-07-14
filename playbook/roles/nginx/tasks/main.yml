@@ -1,0 +1,11 @@
+---
+# tasks file for nginx
+ - name: install nginx
+   apt: name=nginx state=present update_cache=yes
+
+ - name: install apache2-utils
+   apt: name=apache2-utils state=present update_cache=yes
+
+ - name: copy nginx default file
+   template: src=default.j2 dest=/etc/nginx/sites-available/default
+#   notify: start nginx

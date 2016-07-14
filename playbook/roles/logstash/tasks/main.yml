@@ -1,0 +1,24 @@
+---
+# tasks file for logstash
+ - name: add repository
+   apt_repository: repo='deb http://packages.elastic.co/logstash/2.2/debian stable main'
+ - name: update the repo
+   apt: update_cache=yes
+ - name: install logstash
+   apt: name=logstash state=present update_cache=yes
+ - name: copy modified openssl file
+   template: src=openssl.cnf.j2 dest=/etc/ssl/openssl.cnf
+ - name: create /etc/pki/tls/certs directory 
+   file: path=/etc/pki/tls/certs state=directory
+ - name: create /etc/pki/tls/private directory
+   file: path=/etc/pki/tls/private state=directory
+ - name: generate openssl certoificates
+   shell: sudo openssl req -config /etc/ssl/openssl.cnf -x509 -days 3650 -batch -nodes -newkey rsa:2048 -keyout /etc/pki/tls/private/logstash-forwarder.key -out /etc/pki/tls/certs/logstash-forwarder.crt
+ - name: copy 02-beats-input.conf file
+   template: src=02-beats-input.conf dest=/etc/logstash/conf.d/02-beats-input.conf
+ - name: copy 10-syslog-filter.conf file
+   template: src=10-syslog-filter.conf dest=/etc/logstash/conf.d/10-syslog-filter.conf
+ - name: copy 30-elasticsearch-output.conf  file
+   template: src=30-elasticsearch-output.conf dest=/etc/logstash/conf.d/30-elasticsearch-output.conf
+   notify: start logstash
+ 

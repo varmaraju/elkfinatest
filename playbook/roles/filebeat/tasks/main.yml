@@ -1,0 +1,11 @@
+---
+# tasks file for filebeat
+ - apt_key: url=https://packages.elastic.co/GPG-KEY-elasticsearch state=present
+ - apt_repository: repo='deb https://packages.elastic.co/beats/apt stable main'
+ - name: update package
+   apt: update_cache=yes
+ - name: install filebeat
+   apt: name=filebeat state=present update_cache=yes
+ - name: copy nginx default file
+   template: src=filebeat.yml.j2 dest=/etc/filebeat/filebeat.yml
+   notify: start filebeat

@@ -1,0 +1,9 @@
+---
+ - include: java.yml
+ - include: elasticsearch.yml
+ - include: kibana.yml
+ - include: logstash.yml
+ - include: nginx.yml
+ - include: k.yml
+ - include: filebeat.yml
+ - include: r.yml

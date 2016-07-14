@@ -1,0 +1,39 @@
+---
+  - hosts: elk
+    become: true
+    tasks:
+     - name: Download Beats Dashboard
+       get_url: url=https://download.elastic.co/beats/dashboards/beats-dashboards-1.1.0.zip dest=/tmp/ force_basic_auth=yes
+     - name: Unarchive Beats Dashboard zip
+       unarchive:
+          src: /tmp/beats-dashboards-1.1.0.zip
+          dest: /tmp
+          copy: no
+
+     - name: Install Beats Dashboard
+       shell: ./load.sh -url http://localhost:9200
+       args:
+        chdir: /tmp/beats-dashboards-1.1.0
+
+     - name: Import visualizations
+       become: no
+       local_action: shell curl -XPUT http://localhost:9200/.kibana/visualization/{{ (item | basename | splitext)[0] }} -T {{ item }}
+       with_fileglob: kibana_visaulizations_folder
+
+     - name: Import dashboards
+       become: no
+       local_action: shell curl -XPUT http://localhost:9200/.kibana/dashboard/{{ (item | basename | splitext)[0] }} -T {{ item }}
+       with_fileglob: kibana_dashboards_folder
+
+     - name: Import templates
+       become: no
+       local_action: shell curl -XPUT http://localhost:9200/_template/{{ (item | basename | splitext)[0] }} -T {{ item }}
+       with_fileglob: kibana_elasticsearch_templates
+
+     - name: Check nginx config
+       become: yes
+       command: service nginx configtest
+       notify: restart nginx
+
+     - name: restart nginx
+       service: name=nginx state=restarted enabled=yes

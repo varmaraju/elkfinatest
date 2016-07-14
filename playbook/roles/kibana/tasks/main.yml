@@ -1,0 +1,12 @@
+---
+# tasks file for kibana
+ - name: update the kibana repo
+   apt_repository: repo='deb http://packages.elastic.co/kibana/4.4/debian stable main'
+ - name: updated the apt pakage
+   apt: update_cache=yes
+ - name: install kibana
+   apt: name=kibana state=present update_cache=yes
+ - name: Copy kibana config file
+   template: src=kibana.yml.j2 dest=/opt/kibana/config/kibana.yml
+   notify: start kibana
+
